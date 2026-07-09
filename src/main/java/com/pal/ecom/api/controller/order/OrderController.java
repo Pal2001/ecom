@@ -1,4 +1,4 @@
-package com.pal.ecom.api.controller.product.order;
+package com.pal.ecom.api.controller.order;
 
 import com.pal.ecom.model.LocalUser;
 import com.pal.ecom.model.WebOrder;

@@ -1,8 +1,10 @@
 package com.pal.ecom.service;
 
 import com.pal.ecom.api.model.LoginBody;
+import com.pal.ecom.api.model.PasswordResetBody;
 import com.pal.ecom.api.model.RegistrationBody;
 import com.pal.ecom.exception.EmailFailureException;
+import com.pal.ecom.exception.EmailNotFoundException;
 import com.pal.ecom.exception.UserAlreadyExistsException;
 import com.pal.ecom.exception.UserNotVerifiedException;
 import com.pal.ecom.model.LocalUser;
@@ -97,5 +99,27 @@ public class UserServiceImpl implements UserService {
             }
         }
         return false;
+    }
+
+    @Override
+    public void forgotPassword(String email) throws EmailNotFoundException, EmailFailureException {
+        Optional<LocalUser> opUser = localUserDAO.findByEmailIgnoreCase(email);
+        if(opUser.isPresent()){
+            String token = jwtService.generateResetPasswordJwt(opUser.get());
+            emailService.sendResetPasswordEmail(opUser.get(), token);
+        }else {
+            throw new EmailNotFoundException();
+        }
+    }
+
+    @Override
+    public void resetPassword(PasswordResetBody body){
+        String mail = jwtService.getResetPasswordEmail(body.getToken());
+        Optional<LocalUser> opUser = localUserDAO.findByEmailIgnoreCase(mail);
+        if(opUser.isPresent()){
+            LocalUser user = opUser.get();
+            user.setPassword(encryptionService.encryptPassword(body.getPassword()));
+            localUserDAO.save(user);
+        }
     }
 }

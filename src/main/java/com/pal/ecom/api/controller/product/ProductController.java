@@ -1,4 +1,4 @@
-package com.pal.ecom.api.controller.product.product;
+package com.pal.ecom.api.controller.product;
 
 import com.pal.ecom.model.Product;
 import com.pal.ecom.service.ProductService;

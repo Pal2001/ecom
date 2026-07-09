@@ -1,6 +1,7 @@
 package com.pal.ecom.service;
 
 import com.pal.ecom.exception.EmailFailureException;
+import com.pal.ecom.model.LocalUser;
 import com.pal.ecom.model.VerificationToken;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -32,6 +33,20 @@ public class EmailServiceImpl implements EmailService{
         message.setTo(verificationToken.getUser().getEmail());
         message.setSubject("Verify your email to active your account");
         message.setText("Please follow the link below to active your account.\n" + url + "/auth/verify?token=" + verificationToken.getToken());
+        try {
+            javaMailSender.send(message);
+        }
+        catch (MailException ex){
+            throw new EmailFailureException();
+        }
+    }
+
+    @Override
+    public void sendResetPasswordEmail(LocalUser user, String token) throws EmailFailureException {
+        SimpleMailMessage message = makeMailMessage();
+        message.setTo(user.getEmail());
+        message.setSubject("Reset Your Password");
+        message.setText("Please follow the link below to reset your password.\n" + url + "/auth/reset?token=" + token);
         try {
             javaMailSender.send(message);
         }

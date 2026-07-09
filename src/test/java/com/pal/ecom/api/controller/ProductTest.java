@@ -1,4 +1,4 @@
-package com.pal.ecom.api.controller.product;
+package com.pal.ecom.api.controller;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

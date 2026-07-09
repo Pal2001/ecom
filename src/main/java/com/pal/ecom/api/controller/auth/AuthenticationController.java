@@ -1,15 +1,18 @@
-package com.pal.ecom.api.controller.product.auth;
+package com.pal.ecom.api.controller.auth;
 
 import com.pal.ecom.api.model.LoginBody;
 import com.pal.ecom.api.model.LoginResponse;
+import com.pal.ecom.api.model.PasswordResetBody;
 import com.pal.ecom.api.model.RegistrationBody;
 import com.pal.ecom.exception.EmailFailureException;
+import com.pal.ecom.exception.EmailNotFoundException;
 import com.pal.ecom.exception.UserAlreadyExistsException;
 import com.pal.ecom.exception.UserNotVerifiedException;
 import com.pal.ecom.model.LocalUser;
 import com.pal.ecom.service.UserService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -79,5 +82,25 @@ public class AuthenticationController {
         else{
             return ResponseEntity.status(CONFLICT).build();
         }
+    }
+
+    @PostMapping("/forgot")
+    public ResponseEntity forgotPassword(@RequestParam String email){
+
+        try {
+            userService.forgotPassword(email);
+            return ResponseEntity.ok().build();
+        } catch (EmailNotFoundException e) {
+            return ResponseEntity.status(BAD_REQUEST).build() ;
+        } catch (EmailFailureException e) {
+            return ResponseEntity.status(INTERNAL_SERVER_ERROR).build();
+        }
+
+    }
+
+    @PostMapping("/reset")
+    public ResponseEntity resetPassword(@Valid @RequestBody PasswordResetBody body){
+        userService.resetPassword(body);
+        return ResponseEntity.status(OK).build();
     }
 }

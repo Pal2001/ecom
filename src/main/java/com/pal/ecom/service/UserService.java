@@ -1,8 +1,10 @@
 package com.pal.ecom.service;
 
 import com.pal.ecom.api.model.LoginBody;
+import com.pal.ecom.api.model.PasswordResetBody;
 import com.pal.ecom.api.model.RegistrationBody;
 import com.pal.ecom.exception.EmailFailureException;
+import com.pal.ecom.exception.EmailNotFoundException;
 import com.pal.ecom.exception.UserAlreadyExistsException;
 import com.pal.ecom.exception.UserNotVerifiedException;
 import com.pal.ecom.model.LocalUser;
@@ -15,4 +17,6 @@ public interface UserService {
     String loginUser(LoginBody loginBody) throws EmailFailureException, UserNotVerifiedException;
     boolean verifyUser(String token);
     VerificationToken createVerificationToken(LocalUser user);
+    void forgotPassword(String email) throws EmailNotFoundException, EmailFailureException;
+    void resetPassword(PasswordResetBody body);
 }
