@@ -44,15 +44,36 @@ public class JWTServiceTest {
     }
 
     @Test
-    public void testJWTNotGeneratedByUs() throws UnsupportedEncodingException {
+    public void testLoginJWTNotGeneratedByUs() throws UnsupportedEncodingException {
         String token = JWT.create().withClaim("USERNAME", "UserA").sign(Algorithm.HMAC256("NotTheRealSecret"));
         Assertions.assertThrows(SignatureVerificationException.class, () -> jwtService.getUserName(token));
     }
 
     @Test
-    public void testJWTCorrectlySignedNoIssuer() throws UnsupportedEncodingException {
+    public void testLoginJWTCorrectlySignedNoIssuer() throws UnsupportedEncodingException {
         String token = JWT.create().withClaim("USERNAME", "UserA").sign(Algorithm.HMAC256(algorithmKey));
         Assertions.assertThrows(InvalidClaimException.class, () -> jwtService.getUserName(token));
 
+    }
+
+    @Test
+    public void testResetPasswordJWTNotGeneratedByUs() throws UnsupportedEncodingException {
+        String token = JWT.create().withClaim("RESET_PASSWORD_EMAIL_KEY", "UserA@junit.com").sign(Algorithm.HMAC256("NotTheRealSecret"));
+        Assertions.assertThrows(SignatureVerificationException.class, () -> jwtService.getResetPasswordEmail(token));
+    }
+
+    @Test
+    public void testResetPasswordJWTCorrectlySignedNoIssuer() throws UnsupportedEncodingException {
+        String token = JWT.create().withClaim("RESET_PASSWORD_EMAIL_KEY", "UserA@junit.com").sign(Algorithm.HMAC256(algorithmKey));
+        Assertions.assertThrows(InvalidClaimException.class, () -> jwtService.getResetPasswordEmail(token));
+
+    }
+
+    @Test
+    public void testPasswordResetToken(){
+        LocalUser user = localUserDAO.findByUsernameIgnoreCase("UserA").get();
+        String token = jwtService.generateResetPasswordJwt(user);
+        Assertions.assertEquals(user.getEmail(), jwtService.getResetPasswordEmail(token),
+                "Email should match inside "  + "JWT.");
     }
 }
